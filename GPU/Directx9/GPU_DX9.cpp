@@ -445,8 +445,6 @@ void GPU_DX9::Execute_VertexTypeSkinning(u32 op, u32 diff) {
 }
 
 void GPU_DX9::Execute_Prim(u32 op, u32 diff) {
-	SetDrawType(DRAW_PRIM);
-
 	// This drives all drawing. All other state we just buffer up, then we apply it only
 	// when it's time to draw. As most PSP games set state redundantly ALL THE TIME, this is a huge optimization.
 
@@ -454,6 +452,7 @@ void GPU_DX9::Execute_Prim(u32 op, u32 diff) {
 	u32 count = data & 0xFFFF;
 	// Upper bits are ignored.
 	GEPrimitiveType prim = static_cast<GEPrimitiveType>((data >> 16) & 7);
+	SetDrawType(DRAW_PRIM, prim);
 
 	if (count == 0)
 		return;
@@ -516,7 +515,7 @@ void GPU_DX9::Execute_Prim(u32 op, u32 diff) {
 }
 
 void GPU_DX9::Execute_Bezier(u32 op, u32 diff) {
-	SetDrawType(DRAW_BEZIER);
+	SetDrawType(DRAW_BEZIER, GE_PRIM_TRIANGLES);
 
 	// We don't dirty on normal changes anymore as we prescale, but it's needed for splines/bezier.
 	gstate_c.Dirty(DIRTY_UVSCALEOFFSET);
@@ -564,7 +563,7 @@ void GPU_DX9::Execute_Bezier(u32 op, u32 diff) {
 }
 
 void GPU_DX9::Execute_Spline(u32 op, u32 diff) {
-	SetDrawType(DRAW_SPLINE);
+	SetDrawType(DRAW_SPLINE, GE_PRIM_TRIANGLES);
 
 	// We don't dirty on normal changes anymore as we prescale, but it's needed for splines/bezier.
 	gstate_c.Dirty(DIRTY_UVSCALEOFFSET);
